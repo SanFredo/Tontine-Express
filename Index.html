@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tontine Express</title>
+<style>
+:root{
+ --bg:#071d23;--card:rgba(16, 45, 53, 0.75);--card2:rgba(23, 59, 68, 0.6);--tx:#eaf8fa;--mut:#a4c2c8;
+ --acc:#23c4d5;--acc2:#25d6b2;--ok:#35d6a1;--bd:rgba(40, 80, 90, 0.6);
+ --grad:linear-gradient(125deg,#00a9c2 0%,#16c9ad 100%);
+ --shadow:0 16px 40px rgba(0,0,0,0.25), inset 0 1px 1px rgba(255,255,255,0.15);
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)
+}
+:root[data-theme="light"]{--bg:#f4fbfc;--card:rgba(255, 255, 255, 0.8);--card2:rgba(232, 248, 250, 0.7);--tx:#12343b;--mut:#668087;--acc:#00a9c2;--acc2:#16c9ad;--ok:#10a878;--bd:rgba(217, 237, 240, 0.8);--shadow:0 16px 40px rgba(0,111,130,.1), inset 0 1px 1px rgba(255,255,255,0.8)}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at 50% -20%, #0d3844 0%, var(--bg) 70%);color:var(--tx);font:15px/1.55 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh;padding-bottom:120px}
+main{max-width:100%;margin:0 auto;padding:18px 16px 30px}
+h1{font-size:clamp(1.35rem,4vw,1.8rem);line-height:1.2;letter-spacing:-.04em;margin:0 0 5px;font-weight:850}
+h2{font-size:1.08rem;letter-spacing:-.02em;margin:22px 0 10px}
+p{margin:0 0 8px}.mut{color:var(--mut);font-size:.88rem}
+#app{animation:appear .35s ease both}
+@keyframes appear{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.brandbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 18px;padding:5px 2px}
+.brand{display:flex;align-items:center;gap:12px;font-size:1.25rem;font-weight:900;letter-spacing:-.05em;color:var(--tx)}
+
+/* Logo Liquid Glass */
+.brandmark{width:42px;height:42px;border-radius:14px;background:var(--grad);display:grid;place-items:center;position:relative;overflow:hidden;box-shadow:0 8px 20px rgba(0,169,194,0.3), inset 0 2px 3px rgba(255,255,255,0.5);backdrop-filter:blur(8px)}
+.brandmark::before{content:"";position:absolute;inset:2px;border-radius:12px;background:linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.05) 50%, rgba(0,0,0,0.1) 100%);pointer-events:none}
+.brandmark-inner{position:relative;width:20px;height:20px;border:2.5px solid #fff;border-radius:50%;border-top-color:transparent;transform:rotate(45deg);box-shadow:0 0 8px rgba(255,255,255,0.6)}
+.brandmark-inner::after{content:"";position:absolute;right:-4px;bottom:-4px;width:8px;height:8px;background:#fff;border-radius:50%;box-shadow:0 0 6px #fff}
+
+.brand small{display:block;color:var(--mut);font-size:.65rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-top:-3px}
+.theme-btn{background:var(--card2);color:var(--acc);width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:1.1rem;cursor:pointer;border:1px solid var(--bd);backdrop-filter:blur(16px);transition:transform .16s}
+.theme-btn:active{transform:scale(.92)}
+
+.card{background:var(--card);backdrop-filter:blur(24px) saturate(180%);border:1px solid var(--bd);border-radius:24px;padding:18px;margin-bottom:13px;box-shadow:var(--shadow)}
+.hero{background:var(--grad);color:#fff;border:0;position:relative;overflow:hidden;box-shadow:0 16px 32px rgba(0,169,194,0.25), inset 0 1px 2px rgba(255,255,255,0.4)}
+.hero:after{content:"";position:absolute;width:210px;height:210px;border:1px solid #ffffff38;border-radius:50%;right:-75px;top:-90px;box-shadow:0 0 0 22px #ffffff0d,0 0 0 48px #ffffff0a}
+.hero .mut{color:#e7ffffd9}.hero p,.hero .bar{position:relative;z-index:1}
+.big{font-size:clamp(1.7rem,7vw,2.35rem);font-weight:850;letter-spacing:-.055em;line-height:1.15;margin:4px 0 10px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.grid .card{margin:0}
+.stat{position:relative;overflow:hidden;min-height:94px}
+.stat:after{content:"";position:absolute;width:54px;height:54px;border-radius:50%;right:-18px;bottom:-22px;background:var(--card2)}
+.stat b{display:block;font-size:1.15rem;letter-spacing:-.03em;margin-top:5px;position:relative;z-index:1}
+.bar{height:9px;border-radius:99px;background:rgba(255,255,255,0.3);overflow:hidden;margin-top:13px;backdrop-filter:blur(4px)}
+.bar i{display:block;height:100%;background:#fff;border-radius:99px;transition:width .4s ease;box-shadow:0 0 10px rgba(255,255,255,0.8)}
+.row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--bd)}
+.row:last-child{border:0}.row .n{flex:1;min-width:0;overflow-wrap:anywhere}
+.badge{width:34px;height:34px;border-radius:12px;background:var(--card2);color:var(--acc);display:grid;place-items:center;font-weight:800;font-size:.85rem;flex:none;border:1px solid var(--bd)}
+.cur{background:var(--grad);color:#fff;border:0}
+button,input{font:inherit;border-radius:14px}
+button{border:1px solid var(--bd);padding:10px 14px;background:var(--card2);color:var(--tx);cursor:pointer;min-height:44px;transition:transform .16s,filter .16s,box-shadow .16s;backdrop-filter:blur(12px)}
+button:active{transform:scale(.98)}
+button:focus-visible,input:focus-visible{outline:3px solid #23c4d555;outline-offset:2px}
+button.pri{background:var(--grad);color:#fff;font-weight:800;width:100%;border:0;box-shadow:0 10px 22px rgba(0,169,194,0.25), inset 0 1px 1px rgba(255,255,255,0.4)}
+button.ok{background:rgba(220,248,237,0.8);color:#087c55;font-weight:800;border-color:rgba(16,168,120,0.3)}
+button.del{background:transparent;border-color:transparent;color:#f07187}
+button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+input{width:100%;padding:12px 13px;border:1px solid var(--bd);background:var(--card2);color:var(--tx);min-height:46px;backdrop-filter:blur(12px)}
+label{display:block;font-size:.82rem;color:var(--mut);margin:11px 0 5px;font-weight:700}
+.f{display:flex;gap:8px}.f input{flex:1;min-width:0}.f button{width:auto}
+ol.r{padding-left:20px;margin:0}ol.r li{margin-bottom:12px;padding-left:3px}
+.note{border-left:4px solid var(--acc2);background:linear-gradient(110deg,var(--card),var(--card2))}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;background:color-mix(in srgb,var(--bg) 75%,transparent);backdrop-filter:blur(26px) saturate(200%);border-top:1px solid var(--bd);padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));z-index:5}
+nav div{display:flex;width:100%;max-width:100%;gap:6px;padding:0 4px}
+nav button{flex:1;background:none;border:0;font-size:.7rem;font-weight:650;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--mut);border-radius:14px}
+nav button span{font-size:1.25rem}
+nav button[aria-current="page"]{background:var(--card2);color:var(--acc);font-weight:850;border:1px solid var(--bd);box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom,0px));background:var(--card);backdrop-filter:blur(20px);color:var(--tx);border:1px solid var(--bd);padding:11px 18px;border-radius:16px;max-width:90%;display:none;z-index:9;box-shadow:0 12px 30px rgba(0,0,0,0.3);font-size:.9rem}
+@media (min-width:600px){main{padding:24px 22px 38px}.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.card{padding:22px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<main id="app" aria-live="polite"></main>
+<div id="toast" role="status"></div>
+<nav aria-label="Navigation"><div id="nav"></div></nav>
+<script>
+(function(){
+"use strict";
+var KEY="tontine-claire-v1",MAXM=12,MINM=3;
+var TABS=[["home","🏠","Accueil"],["group","👥","Groupe"],["pay","💳","Cotisations"],["rules","📜","Règles"],["me","👤","Profil"]];
+var tab="home",S=load(),adm=false,canWrite=true,mode="local",inflight=0,chain=Promise.resolve();
+
+function initTheme(){
+  var th=localStorage.getItem("tontine-theme");
+  if(th){document.documentElement.setAttribute("data-theme",th);}
+}
+initTheme();
+
+function toggleTheme(){
+  var cur=document.documentElement.getAttribute("data-theme");
+  var next=cur==="light"?"dark":"light";
+  if(cur==="light"){document.documentElement.removeAttribute("data-theme");localStorage.removeItem("tontine-theme");}
+  else{document.documentElement.setAttribute("data-theme",next);localStorage.setItem("tontine-theme",next);}
+  render();
+}
+
+function setMode(m){mode=m;canWrite=m==="local"||(m==="shared"&&adm)}
+function def(){return{name:"Tontine des amis",amount:1000,round:1,
+members:["Awa","Koffi","Mariam","Yao","Aya"].map(function(n){return{name:n,paid:false}}),history:[]}}
+function valid(s){return s&&typeof s.name==="string"&&Number.isInteger(s.amount)&&Number.isInteger(s.round)&&
+Array.isArray(s.members)&&s.members.length>=MINM&&s.members.every(function(m){return m&&typeof m.name==="string"&&typeof m.paid==="boolean"})&&Array.isArray(s.history)}
+function load(){try{var s=JSON.parse(localStorage.getItem(KEY));if(valid(s))return s}catch(e){}return def()}
+function push(){inflight++;chain=chain.then(function(){return ref.set(JSON.parse(JSON.stringify(S)))}).catch(function(e){toast("Enregistrement impossible"+(e&&e.code?" ("+e.code+")":"")+".")}).then(function(){inflight--})}
+function save(){if(mode==="shared"){push();return}try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function banner(){var t={shared:canWrite?"● Groupe partagé · organisateur":"● Groupe partagé · lecture seule",connecting:"Connexion au groupe partagé…",error:"Groupe partagé injoignable pour l’instant"}[mode];return t?"<p class='mut' role='status'>"+t+"</p>":""}
+function esc(t){return String(t).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function fc(n){return Number(n).toLocaleString("fr-FR")+" FCFA"}
+function toast(m){var t=document.getElementById("toast");t.textContent=m;t.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(function(){t.style.display="none"},3200)}
+function info(){var n=S.members.length;return{n:n,done:S.round>n,ben:S.members[S.round-1],next:S.members[S.round],
+paid:S.members.filter(function(m){return m.paid}).length,pot:S.amount*n,locked:S.round>1||S.members.some(function(m){return m.paid})}}
+
+function head(t,s){return"<h1>"+t+"</h1><p class='mut'>"+s+"</p>"}
+function home(){var i=info();
+var hero=i.done?"<div class='card hero'><p class='mut'>Cycle terminé</p><p class='big'>Tout le monde a reçu son tour 🎉</p><p class='mut'>Chacun a reçu exactement ce qu’il a versé.</p></div>":
+"<div class='card hero'><p class='mut'>Tour "+S.round+" sur "+i.n+"</p><p class='mut'>Bénéficiaire</p><p class='big'>"+esc(i.ben.name)+"</p><p>Cagnotte du tour : <b>"+fc(i.pot)+"</b></p>"+
+"<div class='bar' role='progressbar' aria-valuemin='0' aria-valuemax='"+i.n+"' aria-valuenow='"+i.paid+"'><i style='width:"+(i.paid/i.n*100)+"%'></i></div><p class='mut' style='margin-top:8px'>"+i.paid+" cotisation(s) reçue(s) sur "+i.n+"</p></div>";
+return head(esc(S.name),"Épargne de groupe, sans intermédiaire")+hero+
+"<div class='grid'><div class='card stat'><span class='mut'>Cotisation</span><b>"+fc(S.amount)+"</b></div><div class='card stat'><span class='mut'>Membres</span><b>"+i.n+"</b></div>"+
+"<div class='card stat'><span class='mut'>Prochain bénéficiaire</span><b>"+(i.next&&!i.done?esc(i.next.name):"—")+"</b></div><div class='card stat'><span class='mut'>Gain net sur le cycle</span><b>0 FCFA</b></div></div>"+
+"<div class='card note' style='margin-top:12px'><p><b>Comment ça marche</b></p><p class='mut'>Sur un cycle, chaque membre verse "+fc(S.amount*i.n)+" et reçoit "+fc(S.amount*i.n)+". Aucun intérêt, aucune commission : le bénéfice est de recevoir une grosse somme d’un coup.</p></div>"}
+
+function group(){var i=info();
+var list=S.members.map(function(m,k){return"<div class='row'><span class='badge "+(k===S.round-1&&!i.done?"cur":"")+"'>"+(k+1)+"</span><span class='n'>"+esc(m.name)+"</span>"+
+(i.locked||!canWrite?"":"<button class='del' data-a='rm' data-i='"+k+"' aria-label='Retirer "+esc(m.name)+"'>Retirer</button>")+"</div>"}).join("");
+return head("Groupe","Ordre de passage (fixé avant le premier tour)")+"<div class='card'>"+list+"</div>"+
+(i.locked||!canWrite?"<p class='mut'>"+(canWrite?"Le groupe et la cotisation sont verrouillés une fois le cycle commencé, pour que les règles ne changent pas en cours de route.":"Seul l’organisateur peut modifier le groupe.")+"</p>":
+"<div class='card'><label for='nm'>Ajouter un membre</label><div class='f'><input id='nm' maxlength='24' placeholder='Prénom'><button data-a='add'>Ajouter</button></div>"+
+"<label for='am'>Cotisation par tour (FCFA)</label><div class='f'><input id='am' type='number' inputmode='numeric' step='500' min='500' max='500000' value='"+S.amount+"'><button data-a='amt'>Valider</button></div>"+
+"<p class='mut' style='margin-top:8px'>Entre 500 et 500 000, par pas de 500. Entre "+MINM+" et "+MAXM+" membres.</p></div>")}
+
+function pay(){var i=info();
+if(i.done)return head("Cotisations","Cycle terminé")+"<button class='pri' data-a='new'"+(canWrite?"":" disabled")+">Démarrer un nouveau cycle</button>"+hist();
+var rows=S.members.map(function(m,k){return"<div class='row'><span class='n'>"+esc(m.name)+"</span><button class='"+(m.paid?"ok":"")+"' data-a='tg' data-i='"+k+"' aria-pressed='"+m.paid+"'"+(canWrite?"":" disabled")+">"+(m.paid?"✓ Reçue":"En attente")+"</button></div>"}).join("");
+return head("Cotisations","Tour "+S.round+" : versez directement à "+esc(i.ben.name))+"<div class='card'>"+rows+"</div>"+
+"<button class='pri' data-a='close' "+(i.paid<i.n||!canWrite?"disabled":"")+">Clôturer le tour</button><p class='mut' style='margin-top:8px'>Le tour se clôture quand les "+i.n+" cotisations sont confirmées.</p>"+hist()}
+function hist(){if(!S.history.length)return"";
+return"<h2>Historique</h2><div class='card'>"+S.history.map(function(h){return"<div class='row'><span class='badge'>"+h.round+"</span><span class='n'>"+esc(h.who)+" a reçu <b>"+fc(h.pot)+"</b><br><span class='mut'>"+esc(h.date)+"</span></span></div>"}).join("")+"</div>"}
+
+function rules(){var r=["Chaque membre verse la même cotisation à chaque tour.","À chaque tour, un seul membre reçoit toute la cagnotte, dans l’ordre annoncé au départ.","L’argent ne passe pas par ce site : les membres se paient directement par mobile money. Le site sert de registre partagé.","Aucun frais, aucune commission, aucun intérêt promis. À la fin du cycle, chacun a reçu exactement ce qu’il a versé.","Le bénéficiaire du tour continue de cotiser aux tours suivants jusqu’à la fin du cycle.","Le groupe et le montant ne changent plus après le premier versement.","Ne participez qu’avec des personnes que vous connaissez, et seulement avec une somme que vous pouvez vous permettre de perdre."];
+return head("Règles","Simples et visibles par tous")+"<div class='card'><ol class='r'>"+r.map(function(x){return"<li>"+x+"</li>"}).join("")+"</ol></div><div class='card note'><p><b>Méfiez-vous des faux « groupes »</b></p><p class='mut'>Une vraie tontine ne promet jamais de gain supérieur à ce que les membres ont versé, et ne récompense pas le fait de recruter.</p></div>"}
+
+function me(){var t={local:"Mode local : les données restent dans ce navigateur.",shared:canWrite?"Groupe partagé : tu es l’organisateur, tes modifications sont visibles par tous les membres.":"Groupe partagé : tu es en lecture seule, seul l’organisateur confirme les cotisations.",connecting:"Connexion au groupe partagé…",error:"Groupe partagé injoignable pour l’instant."}[mode];
+return head("Profil","Données et confidentialité")+"<div class='card'><p>"+t+"</p><p class='mut'>Ce site ne collecte aucun numéro et ne détient aucun argent.</p></div>"+(canWrite?"<button class='pri' data-a='reset'>Réinitialiser le groupe d’exemple</button>":"")}
+
+var V={home:home,group:group,pay:pay,rules:rules,me:me};
+function render(){
+  var isLight=document.documentElement.getAttribute("data-theme")==="light";
+  document.getElementById("app").innerHTML=
+  "<header class='brandbar'><div class='brand'><div class='brandmark' aria-hidden='true'><div class='brandmark-inner'></div></div><span>Tontine <span style='color:var(--acc)'>Express</span><small>Épargne collective</small></span></div><button class='theme-btn' id='themeToggle' aria-label='Changer le thème'>"+(isLight?"🌙":"☀️")+"</button></header>"+banner()+V[tab]();
+  document.getElementById("nav").innerHTML=TABS.map(function(t){return"<button data-t='"+t[0]+"'"+(t[0]===tab?" aria-current='page'":"")+"><span aria-hidden='true'>"+t[1]+"</span>"+t[2]+"</button>"}).join("");
+  var thBtn=document.getElementById("themeToggle");
+  if(thBtn)thBtn.addEventListener("click",toggleTheme);
+}
+
+var A={
+add:function(){var el=document.getElementById("nm"),v=el.value.trim().replace(/\s+/g," ");
+if(!v)return toast("Entre un prénom.");if(v.length>24)return toast("24 caractères maximum.");
+if(S.members.length>=MAXM)return toast("Maximum "+MAXM+" membres.");
+if(S.members.some(function(m){return m.name.toLowerCase()===v.toLowerCase()}))return toast("Ce prénom existe déjà.");
+S.members.push({name:v,paid:false});done("Membre ajouté.")},
+rm:function(k){if(S.members.length<=MINM)return toast("Il faut au moins "+MINM+" membres.");S.members.splice(k,1);done("Membre retiré.")},
+amt:function(){var v=Number(document.getElementById("am").value);
+if(!Number.isInteger(v)||v<500||v>500000||v%500!==0)return toast("Montant invalide : 500 à 500 000, par pas de 500.");
+S.amount=v;done("Cotisation mise à jour.")},
+tg:function(k){S.members[k].paid=!S.members[k].paid;done()},
+close:function(){var i=info();if(i.paid<i.n)return toast("Toutes les cotisations ne sont pas confirmées.");
+S.history.unshift({round:S.round,who:i.ben.name,pot:i.pot,date:new Date().toLocaleDateString("fr-FR")});
+S.members.forEach(function(m){m.paid=false});S.round++;done("Tour clôturé.")},
+"new":function(){S.round=1;S.history=[];S.members.forEach(function(m){m.paid=false});done("Nouveau cycle.")},
+reset:function(){if(window.confirm("Remettre l’exemple d’origine ?")){S=def();done("Exemple réinitialisé.")}}
+};
+function done(m){save();render();if(m)toast(m)}
+document.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;
+if(b.dataset.t){tab=b.dataset.t;render();window.scrollTo(0,0);return}
+var a=b.dataset.a;if(a&&A[a]&&!b.disabled){if(!canWrite)return toast("Lecture seule : seul l’organisateur peut modifier.");A[a](b.dataset.i===undefined?undefined:Number(b.dataset.i))}});
+(async function(){
+try{
+if(!window.claude||!window.claude.use)return;
+var d=await window.claude.use("db");if(!d)return;
+var u=await window.claude.use("user");adm=u?await u.canEdit():false;
+ref=d.doc("groups/main");setMode("connecting");render();
+var t=setTimeout(function(){setMode("error");render()},10000);
+ref.onSnapshot(function(snap){
+clearTimeout(t);
+if(inflight>0)return;
+var v=snap.exists?JSON.parse(JSON.stringify(snap.data())):null;
+if(v&&valid(v)){if(mode!=="shared"||JSON.stringify(v)!==JSON.stringify(S)){S=v;setMode("shared");render()}return}
+S=def();setMode("shared");render()
+},function(){clearTimeout(t);setMode("error");render()});
+}catch(e){}
+})();
+render();
+})();
+</script>
+</body>
+</html>
+
